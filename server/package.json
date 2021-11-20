@@ -1,0 +1,22 @@
+{
+  "name": "edenserver",
+  "version": "0.0.2",
+  "description": "Server for Nugen Tracker",
+  "main": "index.js",
+  "author": "Rome Canete",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=development nodemon index.js"
+  },
+  "dependencies": {
+    "apollo-server": "^2.24.0",
+    "apollo-server-express": "^2.24.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12",
+    "nodemon": "^2.0.14"
+  }
+}
