@@ -18,15 +18,63 @@ const generateToken = (dbObject) => {
 
 module.exports = {
     Query: {
-        getAccounts: async (_, { }, context) => {
+        getAccounts: async (_, args, context) => {
             const account = checkAuth(context);
             try {
                 const accountData = await Account.findById(account.id);
                 if (accountData) {
-                    const accountList = await Account.find().sort({ createdAt: -1 });
+
+                    let { search, filter } = args;
+
+                    let queryArg = {};
+                    if (search) {
+                        if (!queryArg.$and) {
+                            queryArg.$and = [];
+                        }
+                        queryArg.$and.push({
+                            username: {
+                                $regex: search,
+                                $options: "i"
+                            }
+                        });
+                    }
+
+                    if (filter) {
+                        if (filter.accessType) {
+                            if (!queryArg.$and) {
+                                queryArg.$and = [];
+                            }
+                            queryArg.$and.push({
+                                accessType: filter.accessType
+                            });
+                        }
+                        if (filter.signupAt) {
+                            if (!queryArg.$and) {
+                                queryArg.$and = [];
+                            }
+                            queryArg.$and.push({
+                                signupAt: filter.signupAt
+                            });
+                        }
+                        if (filter.createdAt) {
+                            if (!queryArg.$and) {
+                                queryArg.$and = [];
+                            }
+                            let date = new Date(filter.createdAt);
+                            queryArg.$and.push({
+                                createdAt: {
+                                    $lt: new Date(date.setDate(date.getDate() + 1)),
+                                    $gte: new Date(date.setDate(date.getDate() - 1))
+                                }
+                            });
+                        }
+
+                    }
+
+                    const accountList = await Account.find(queryArg).sort({ createdAt: -1 });
                     return accountList;
                 } else {
-                    throw new uthenticationError("Token is invalid!");
+                    throw new AuthenticationError("Token is invalid!");
                 }
             } catch (error) {
                 throw new Error(error);
@@ -100,18 +148,25 @@ module.exports = {
                 password,
                 accessType,
                 signupAt,
-                createdAt: new Date().toString(),
-                updatedAt: new Date().toString()
+                createdAt: new Date(),
+                updatedAt: new Date()
             });
 
             const addAccount = await newAccount.save();
+
+            let bDate = new Date();
+            if (birthdate) {
+                bDate = new Date(birthdate);
+            } else {
+                bDate = null;
+            }
 
             const newUser = new User({
                 firstName,
                 middleName,
                 lastName,
                 nickname,
-                birthdate,
+                birthdate: bDate,
                 fbAccount,
                 contactNo,
                 emailAdd,
@@ -124,15 +179,20 @@ module.exports = {
                 eon,
                 accountId: addAccount.id,
                 signupAt,
-                createdAt: new Date().toString(),
-                updatedAt: new Date().toString()
+                createdAt: new Date(),
+                updatedAt: new Date()
             });
 
             const addUser = await newUser.save();
 
             return {
-                id: addAccount.id,
-                ...addAccount._doc,
+                success: true,
+                message: "Registered Successfully!",
+                account: {
+                    ...addAccount._doc,
+                    createdAt: addAccount.createdAt.toISOString(),
+                    updatedAt: addAccount.updatedAt.toISOString(),
+                },
                 user: {
                     ...addUser._doc
                 }
@@ -162,6 +222,8 @@ module.exports = {
             const token = generateToken(existingAccount);
 
             return {
+                success: true,
+                message: "Login Successfully!",
                 account: existingAccount,
                 token
             };

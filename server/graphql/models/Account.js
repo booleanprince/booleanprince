@@ -6,8 +6,8 @@ const accountSchema = new Schema({
     password: String,
     accessType: String,
     signupAt: String,
-    createdAt: String,
-    updatedAt: String,
+    createdAt: Date,
+    updatedAt: Date,
 });
 
 module.exports = model('Account', accountSchema);

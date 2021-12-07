@@ -12,7 +12,6 @@ module.exports = gql`
         email: String!
         accessType: String!
         signupAt: String
-
         createdAt: String
         updatedAt: String
     }
@@ -39,15 +38,23 @@ module.exports = gql`
         updatedAt: String
     }
 
-    type loginResponse {
-        account: Account,
-        token: String
+    interface Response {
+        success: Boolean
+        message: String
     }
 
-    type RegisterResponse {
-        id: ID!
-        account: Account!
-        user: User!
+    type LoginResponse implements Response {
+        account: Account,
+        token: String
+        success: Boolean
+        message: String
+    }
+
+    type RegisterResponse implements Response{
+        account: Account
+        user: User
+        success: Boolean
+        message: String   
     }
 
     input RegisterAccountInput {
@@ -111,9 +118,16 @@ module.exports = gql`
         password: String!
     }
 
+    input AccountFilter {
+        accessType: String
+        signupAt: String
+        createdAt: String
+        updatedAt: String
+    }
+
     #Queries in the API
     type Query {
-        getAccounts: [Account]
+        getAccounts(search: String, filter: AccountFilter): [Account]
         getAccountDetails(accountId: ID!): Account
         getUsers: [User]
         getUserDetails(userId: ID!): User
@@ -121,8 +135,8 @@ module.exports = gql`
 
     #Mutations in the API
     type Mutation {
-        register(regAccountInput: RegisterAccountInput, regUserInput: RegisterUserInput): Account!
-        login(loginInput: LoginInput): loginResponse!
+        register(regAccountInput: RegisterAccountInput, regUserInput: RegisterUserInput): RegisterResponse
+        login(loginInput: LoginInput): LoginResponse!
         createUser(regUserInput: RegisterUserInput, accountId: String): User!
         deleteAccount(accountId: ID!): JSON
         updateAccount(accountId: ID!, updateAccountInput: UpdateAccountInput!): Account

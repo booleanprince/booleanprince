@@ -5,7 +5,7 @@ const userSchema = new Schema({
     middleName: String,
     lastName: String,
     nickname: String,
-    birthdate: String,
+    birthdate: Date,
     fbAccount: String,
     contactNo: String,
     emailAdd: String,
@@ -17,8 +17,8 @@ const userSchema = new Schema({
     position1FC: String,
     eon: String,
     accountId: String,
-    createdAt: String,
-    updatedAt: String,
+    createdAt: Date,
+    updatedAt: Date,
 });
 
 module.exports = model('User', userSchema);
