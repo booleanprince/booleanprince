@@ -3,6 +3,7 @@ const { gql } = require('apollo-server');
 module.exports = gql`
     #Type Definitions for establishing GraphQL Schema
     scalar JSON
+    scalar ISODate
 
     #TypeDefs define the structure of the data that clients can query
 
@@ -12,8 +13,8 @@ module.exports = gql`
         email: String!
         accessType: String!
         signupAt: String
-        createdAt: String
-        updatedAt: String
+        createdAt: ISODate
+        updatedAt: ISODate
     }
 
     type User {
@@ -23,7 +24,7 @@ module.exports = gql`
         lastName: String!
         middleName: String
         nickname: String
-        birthday: String
+        birthday: ISODate
         fbAccount: String
         contactNo: String
         emailAdd: String
@@ -34,8 +35,8 @@ module.exports = gql`
         yearBaptism: Int!
         position1FC: String!
         eon: String!
-        createdAt: String
-        updatedAt: String
+        createdAt: ISODate
+        updatedAt: ISODate
     }
 
     interface Response {
@@ -51,10 +52,11 @@ module.exports = gql`
     }
 
     type RegisterResponse implements Response{
-        account: Account
-        user: User
+        id: ID!
+        account: Account!
+        user: User!
         success: Boolean
-        message: String   
+        message: String
     }
 
     input RegisterAccountInput {

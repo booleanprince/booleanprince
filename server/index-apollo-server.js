@@ -26,6 +26,9 @@ mongoose.connect(process.env.MONGODB, {
 const server = new ApolloServer({
     typeDefs,
     resolvers,
+    resolverValidationOptions: {
+        requireResolversForResolveType: false
+    },
     context: ({ req }) => ({ req }),
 });
 
